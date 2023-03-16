@@ -1,45 +1,43 @@
-//your JS code here. If required.
-const promises = [];
+ const getRandomTime = () => Math.floor(Math.random() * 3) + 1;
 
-for (let i = 1; i <= 3; i++) {
-  const promise = new Promise((resolve) => {
-    const time = Math.floor(Math.random() * 3000) + 1000;
-    setTimeout(() => {
-      resolve(time / 1000);
-    }, time);
-  });
-  promises.push(promise);
-}
+  const promises = [
+    new Promise((resolve) => setTimeout(() => resolve(), getRandomTime() * 1000)),
+    new Promise((resolve) => setTimeout(() => resolve(), getRandomTime() * 1000)),
+    new Promise((resolve) => setTimeout(() => resolve(), getRandomTime() * 1000)),
+  ];
 
-const loadingRow = `
-  <tr>
-    <td colspan="2">Loading...</td>
-  </tr>
-`;
-document.querySelector('#output').innerHTML = loadingRow;
+  Promise.all(promises)
+    .then(() => {
+      const loadingRow = document.querySelector('#loading');
+      loadingRow.parentNode.removeChild(loadingRow);
 
-Promise.all(promises)
-  .then((times) => {
-    const tableRows = `
-      <tr>
-        <td>Promise 1</td>
-        <td>${times[0]}</td>
-      </tr>
-      <tr>
-        <td>Promise 2</td>
-        <td>${times[1]}</td>
-      </tr>
-      <tr>
-        <td>Promise 3</td>
-        <td>${times[2]}</td>
-      </tr>
-      <tr>
-        <td>Total</td>
-        <td>${(times.reduce((total, time) => total + time, 0)).toFixed(3)}</td>
-      </tr>
-    `;
-    document.querySelector('#output').innerHTML = tableRows;
-  })
-  .catch((error) => {
-    console.error(error);
-  });
+      const output = document.querySelector('#output');
+
+      promises.forEach((promise, index) => {
+        const row = document.createElement('tr');
+
+        const nameCell = document.createElement('td');
+        nameCell.textContent = `Promise ${index + 1}`;
+        row.appendChild(nameCell);
+
+        const timeCell = document.createElement('td');
+        timeCell.textContent = `${getRandomTime()}`;
+        row.appendChild(timeCell);
+
+        output.appendChild(row);
+      });
+
+      const totalTime = promises.reduce((acc, promise) => acc + (getRandomTime() * 1000), 0);
+      const totalRow = document.createElement('tr');
+
+      const totalNameCell = document.createElement('td');
+      totalNameCell.textContent = 'Total';
+      totalRow.appendChild(totalNameCell);
+
+      const totalTimeCell = document.createElement('td');
+      totalTimeCell.textContent = `${(totalTime / 1000).toFixed(3)}`;
+      totalRow.appendChild(totalTimeCell);
+
+      output.appendChild(totalRow);
+    })
+    .catch((error) => console.error(error));
